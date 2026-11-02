@@ -1,5 +1,7 @@
 # Switch Mystery Practice
 
+Here is for an easy link https://krbmab0907.github.io/Switch-Case-Practice-for-210-/
+
 A self-grading practice quiz for tracing Java `switch` statements (CS1 / Programming Principles I).
 
 It has three problems with 15 method calls in total. They cover:
