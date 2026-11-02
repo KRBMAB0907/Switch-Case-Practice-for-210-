@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Switch Mystery Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Public+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: single readable column; each problem = prompt, dark code panel, two-column call/answer grid */
+:root {
+  --bg: #f4f5f8;
+  --surface: #ffffff;
+  --fg: #1b1f2a;
+  --muted: #5d6578;
+  --line: #dcdfe7;
+  --chip: #eceff5;
+  --accent: #2f5bd3;
+  --good: #1d7a46; --good-bg: #e3f4ea;
+  --bad: #b3261e;  --bad-bg: #fbe7e5;
+  --code-bg: #1e1f22; --code-fg: #d7dae0;
+  --k: #7aa2f7; --s: #9ece6a; --n: #e0af68; --m: #4fd6be; --c: #7a8194;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Public Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #14161c; --surface: #1c1f27; --fg: #e6e8ee; --muted: #9aa1b2; --line: #2e3340; --chip: #252a35;
+  --accent: #8aa9ff; --good: #6fd39b; --good-bg: #173325; --bad: #ff8a80; --bad-bg: #3a1c1b;
+  --code-bg: #0e0f13; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #14161c; --surface: #1c1f27; --fg: #e6e8ee; --muted: #9aa1b2; --line: #2e3340; --chip: #252a35;
+  --accent: #8aa9ff; --good: #6fd39b; --good-bg: #173325; --bad: #ff8a80; --bad-bg: #3a1c1b;
+  --code-bg: #0e0f13; color-scheme: dark }
+
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 960px; margin: 0 auto; padding-block: 28px 64px; display: grid; gap: 40px; }
+header { display: grid; gap: 10px; }
+.crumb { color: var(--muted); font-size: 14px; }
+h1, h2 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(28px, 5vw, 38px); font-weight: 800; }
+h2 { font-size: 26px; font-weight: 800; }
+.lede { margin: 0; max-width: 68ch; color: var(--muted); }
+.score { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.pill { font-size: 13px; border: 1px solid var(--line); background: var(--surface); padding: 4px 10px; border-radius: 6px; font-variant-numeric: tabular-nums; }
+.pill strong { color: var(--accent); }
+
+section.problem { display: grid; gap: 14px; }
+.ptop { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.problem p { margin: 0; max-width: 75ch; }
+code.inline { font-family: var(--mono); font-size: 0.88em; background: var(--chip); border: 1px solid var(--line); padding: 1px 6px; border-radius: 4px; }
+.codebox { background: var(--code-bg); color: var(--code-fg); border-radius: 6px; overflow-x: auto; }
+.codebox pre { margin: 0; padding: 16px 18px; font-family: var(--mono); font-size: 13.5px; line-height: 1.6; }
+.tk { color: var(--k); } .ts { color: var(--s); } .tn { color: var(--n); } .tm { color: var(--m); } .tc { color: var(--c); font-style: italic; }
+
+.table { display: grid; }
+.thead, .row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+.thead { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.row { padding-block: 12px; align-items: start; }
+.call { font-family: var(--mono); font-size: 13.5px; background: var(--chip); border: 1px solid var(--line); border-radius: 5px; padding: 8px 10px; white-space: pre; overflow-x: auto; justify-self: start; max-width: 100%; }
+.ans { display: grid; gap: 6px; min-width: 0; }
+.ans input { font-family: var(--mono); font-size: 14px; width: 100%; max-width: 260px; padding: 9px 10px; border-radius: 5px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); }
+.ans input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+.ans input.ok { border-color: var(--good); background: var(--good-bg); }
+.ans input.no { border-color: var(--bad); background: var(--bad-bg); }
+.fb { font-size: 13.5px; color: var(--muted); max-width: 46ch; }
+.fb b.ok { color: var(--good); } .fb b.no { color: var(--bad); }
+.fb code { font-family: var(--mono); font-size: 0.92em; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+button { font-family: var(--body); font-size: 14px; font-weight: 600; padding: 9px 16px; border-radius: 6px; cursor: pointer; border: 1px solid var(--accent); }
+button.primary { background: var(--accent); color: var(--surface); }
+button.ghost { background: transparent; color: var(--accent); }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 0; }
+.tips { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; display: grid; gap: 8px; }
+.tips h3 { margin: 0; font-family: var(--display); font-size: 18px; }
+.tips ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+
+@media (max-width: 620px) {
+  .thead { display: none; }
+  .row { grid-template-columns: minmax(0, 1fr); gap: 8px; border-bottom: 1px solid var(--line); }
+  .ans input { max-width: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="crumb">← Quiz practice: Conditionals &amp; Switch</div>
+    <h1>Switch Mystery</h1>
+    <p class="lede">Trace each method by hand, then type what each call returns. For <code class="inline">String</code> results, quotes are optional. Check one problem at a time or all at once.</p>
+    <div class="score"><span class="pill">Score: <strong id="score">0</strong> / <span id="total">15</span></span>
+      <button class="primary" id="checkAll" type="button">Check all</button>
+      <button class="ghost" id="resetAll" type="button">Reset</button></div>
+  </header>
+  <div id="problems" class="wrap" style="padding:0;gap:48px"></div>
+  <aside class="tips">
+    <h3>Tracing reminders</h3>
+    <ul>
+      <li>Without <code class="inline">break</code>, execution <em>falls through</em> into the next case's statements.</li>
+      <li>A <code class="inline">return</code> inside a case leaves the whole method immediately.</li>
+      <li><code class="inline">default</code> runs only when no case matches, or when an earlier case falls into it.</li>
+      <li>In Java, <code class="inline">%</code> keeps the sign of the left operand: <code class="inline">-3 % 4</code> is <code class="inline">-3</code>.</li>
+    </ul>
+  </aside>
+</div>
+
+<script>
+const PROBLEMS = [
+  {
+    title: "Switch Mystery 1", pts: 5, kind: "String",
+    prompt: "Consider the following method. For each call below, write the value that is returned.",
+    code:
+`public static String switchMystery1(int n) {
+    String result = "";
+    switch (n % 4) {
+        case 0:
+            result += "A";
+        case 1:
+            result += "B";
+            break;
+        case 2:
+            result += "C";
+        default:
+            result += "D";
+    }
+    return result + n;
+}`,
+    calls: [
+      ["switchMystery1(8)",  "AB8", "8 % 4 = 0 → \"A\", falls into case 1 → \"B\", break."],
+      ["switchMystery1(5)",  "B5",  "5 % 4 = 1 → \"B\", break."],
+      ["switchMystery1(6)",  "CD6", "6 % 4 = 2 → \"C\", no break, falls into default → \"D\"."],
+      ["switchMystery1(3)",  "D3",  "3 % 4 = 3, no case 3 → default → \"D\"."],
+      ["switchMystery1(-3)", "D-3", "-3 % 4 = -3 in Java, no match → default → \"D\"."]
+    ]
+  },
+  {
+    title: "Switch Mystery 2", pts: 5, kind: "int",
+    prompt: "This method switches on each character of a String. For each call, write the value that is returned.",
+    code:
+`public static int switchMystery2(String s) {
+    int total = 0;
+    for (int i = 0; i < s.length(); i++) {
+        switch (s.charAt(i)) {
+            case 'a':
+            case 'e':
+                total += 2;
+                break;
+            case 'x':
+                total *= 3;
+                break;
+            case 'z':
+                total = 0;
+            default:
+                total++;
+        }
+    }
+    return total;
+}`,
+    calls: [
+      ["switchMystery2(\"ax\")",   "6", "a: 0+2 = 2, x: 2*3 = 6."],
+      ["switchMystery2(\"bee\")",  "5", "b: default → 1, e: 3, e: 5."],
+      ["switchMystery2(\"xax\")",  "6", "x: 0*3 = 0, a: 2, x: 6."],
+      ["switchMystery2(\"azb\")",  "2", "a: 2, z: reset to 0 then falls into default → 1, b: 2."],
+      ["switchMystery2(\"exez\")", "1", "e: 2, x: 6, e: 8, z: 0 then default → 1."]
+    ]
+  },
+  {
+    title: "Switch Mystery 3", pts: 5, kind: "int",
+    prompt: "This method switches on the difference of its parameters. For each call, write the value that is returned.",
+    code:
+`public static int switchMystery3(int x, int y) {
+    switch (x - y) {
+        case 0:
+            return x * 2;
+        case 1:
+            y += 10;
+        case 2:
+            x = x + y;
+            break;
+        case -1:
+            return y - x;
+        default:
+            x = y;
+    }
+    return x + y;
+}`,
+    calls: [
+      ["switchMystery3(4, 4)", "8",  "x - y = 0 → return 4 * 2."],
+      ["switchMystery3(5, 4)", "33", "x - y = 1 → y = 14, falls into case 2 → x = 19, break → 19 + 14."],
+      ["switchMystery3(7, 5)", "17", "x - y = 2 → x = 12, break → 12 + 5."],
+      ["switchMystery3(3, 4)", "1",  "x - y = -1 → return 4 - 3."],
+      ["switchMystery3(9, 2)", "4",  "x - y = 7 → default → x = 2 → 2 + 2."]
+    ]
+  }
+];
+
+const KW = /\b(public|static|void|int|String|char|switch|case|default|break|return|for|if|else|new|boolean|double|while)\b/g;
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function highlight(src){
+  // tokenise strings/chars first so keywords inside them stay untouched
+  return src.split(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/).map((part, i) => {
+    if (i % 2) return `<span class="ts">${esc(part)}</span>`;
+    return esc(part)
+      .replace(KW, '<span class="tk">$1</span>')
+      .replace(/\b(switchMystery\d)\b/g, '<span class="tm">$1</span>')
+      .replace(/(?<![\w#])(-?\d+)\b/g, '<span class="tn">$1</span>');
+  }).join("");
+}
+
+const root = document.getElementById("problems");
+PROBLEMS.forEach((p, pi) => {
+  const sec = document.createElement("section");
+  sec.className = "problem";
+  sec.innerHTML = `
+    ${pi ? "<hr>" : ""}
+    <div class="ptop"><h2>${p.title}</h2><span class="pill">${p.pts} points</span></div>
+    <p>${p.prompt} ${p.kind === "String" ? "Quotes around the String are optional." : ""}</p>
+    <div class="codebox"><pre>${highlight(p.code)}</pre></div>
+    <div class="table">
+      <div class="thead"><span>Method call</span><span>Returned value</span></div>
+      ${p.calls.map((c, ci) => `
+        <div class="row">
+          <div class="call">${highlight(c[0] + ";")}</div>
+          <div class="ans">
+            <input id="a-${pi}-${ci}" type="text" autocomplete="off" spellcheck="false" aria-label="Answer for ${esc(c[0])}">
+            <div class="fb" id="f-${pi}-${ci}" hidden></div>
+          </div>
+        </div>`).join("")}
+    </div>
+    <div class="actions">
+      <button class="primary" type="button" data-check="${pi}">Check answers</button>
+      <button class="ghost" type="button" data-show="${pi}">Show solutions</button>
+    </div>`;
+  root.appendChild(sec);
+});
+
+function norm(v){ return v.trim().replace(/^"(.*)"$/, "$1").replace(/\s+/g, ""); }
+function gradeOne(pi, ci, reveal){
+  const [call, answer, why] = PROBLEMS[pi].calls[ci];
+  const input = document.getElementById(`a-${pi}-${ci}`);
+  const fb = document.getElementById(`f-${pi}-${ci}`);
+  const ok = norm(input.value) === answer;
+  input.classList.toggle("ok", ok);
+  input.classList.toggle("no", !ok && (input.value.trim() !== "" || reveal));
+  if (!ok && input.value.trim() === "" && !reveal) { fb.hidden = true; input.classList.remove("no"); return false; }
+  const shown = PROBLEMS[pi].kind === "String" ? `"${answer}"` : answer;
+  fb.innerHTML = ok ? `<b class="ok">Correct.</b> ${esc(why)}`
+                    : `<b class="no">Answer: <code>${esc(shown)}</code></b> ${esc(why)}`;
+  fb.hidden = false;
+  return ok;
+}
+function check(pi, reveal){ PROBLEMS[pi].calls.forEach((_, ci) => gradeOne(pi, ci, reveal)); updateScore(); }
+function updateScore(){
+  let s = 0;
+  PROBLEMS.forEach((p, pi) => p.calls.forEach((c, ci) => {
+    if (norm(document.getElementById(`a-${pi}-${ci}`).value) === c[1]) s++;
+  }));
+  document.getElementById("score").textContent = s;
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.check) check(+b.dataset.check, false);
+  if (b.dataset.show) check(+b.dataset.show, true);
+  if (b.id === "checkAll") PROBLEMS.forEach((_, pi) => check(pi, false));
+  if (b.id === "resetAll") {
+    document.querySelectorAll(".ans input").forEach(i => { i.value = ""; i.classList.remove("ok","no"); });
+    document.querySelectorAll(".fb").forEach(f => f.hidden = true);
+    updateScore();
+  }
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Enter" && e.target.matches(".ans input")) {
+    const [, pi, ci] = e.target.id.split("-").map(Number);
+    gradeOne(pi, ci, false); updateScore();
+  }
+});
+</script>
+</body>
+</html>
